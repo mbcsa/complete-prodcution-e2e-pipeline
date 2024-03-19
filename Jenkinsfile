@@ -13,7 +13,7 @@ pipeline{
         DOCKER_PASS = "Corsisa01"
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-        DOCKER_REGISTRY = "http://192.168.200.4"
+        DOCKER_REGISTRY = "http://192.168.200.4:5000"
     }
     stages {
         stage("Cleanup Workspace") {
