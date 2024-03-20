@@ -14,6 +14,9 @@ pipeline{
         DOCKER_REGISTRY = "http://192.168.200.4:5000"
         DOCKER_REGISTRY_CREDENTIALS = "corsisa-registry-user"
         SONAR_CREDENTIALS = "jenkins-sonarqube-token"
+        GIT_URL = "https://github.com/mbcsa/complete-prodcution-e2e-pipeline"
+        GIT_CREDENTIALS = "github"
+        GIT_BRANCH = "main"
     }
     stages {
         stage("Cleanup Workspace") {
@@ -23,7 +26,7 @@ pipeline{
         }
         stage("Checkout from SCM") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/mbcsa/complete-prodcution-e2e-pipeline'
+                git branch: GIT_BRANCH, credentialsId: GIT_CREDENTIALS, url: GIT_URL
             }
         }
         stage("Build") {
@@ -39,7 +42,7 @@ pipeline{
         stage("Sonarqube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                    withSonarQubeEnv(credentialsId: SONAR_CREDENTIALS) {
                         sh "mvn sonar:sonar"
                     }
                 }
@@ -50,14 +53,14 @@ pipeline{
                 timeout(time: 1, unit: 'HOURS') {
                     // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
                     // true = set pipeline to UNSTABLE, false = don't
-                    waitForQualityGate abortPipeline: true, credentialsId: $SONAR_CREDENTIALS
+                    waitForQualityGate abortPipeline: true, credentialsId: SONAR_CREDENTIALS
                 }
             }
         }
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry($DOCKER_REGISTRY, $DOCKER_REGISTRY_CREDENTIALS) {
+                    docker.withRegistry(DOCKER_REGISTRY, DOCKER_REGISTRY_CREDENTIALS) {
                         docker_image = docker.build "${IMAGE_NAME}"
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push("latest")
