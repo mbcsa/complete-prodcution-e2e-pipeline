@@ -9,11 +9,11 @@ pipeline{
     environment {
         APP_NAME = "complete-prodcution-e2e-pipeline"
         RELEASE = "1.0.0"
-        DOCKER_USER = "csadocker"
-        DOCKER_PASS = "Corsisa01"
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         DOCKER_REGISTRY = "http://192.168.200.4:5000"
+        DOCKER_REGISTRY_CREDENTIALS = "corsisa-registry-user"
+        SONAR_CREDENTIALS = "jenkins-sonarqube-token"
     }
     stages {
         stage("Cleanup Workspace") {
@@ -47,21 +47,28 @@ pipeline{
         }
         stage("Quality Gate") {
             steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
+                timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true, credentialsId: $SONAR_CREDENTIALS
                 }
             }
         }
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry(DOCKER_REGISTRY, DOCKER_PASS) {
+                    docker.withRegistry($DOCKER_REGISTRY, $DOCKER_REGISTRY_CREDENTIALS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push("latest")
+                    }
+                    /*docker.withRegistry(DOCKER_REGISTRY, DOCKER_PASS) {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
                     docker.withRegistry(DOCKER_REGISTRY, DOCKER_PASS) {
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push("latest")
-                    }
+                    }*/
                 }
             }
         }
