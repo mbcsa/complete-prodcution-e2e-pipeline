@@ -11,7 +11,7 @@ pipeline{
         RELEASE = "1.0.0"
         DOCKER_REGISTRY = "http://devops.corsisa.com.ar:32000"
 /*        DOCKER_REGISTRY = "https://dkreg.corsisa.com.ar"  DOCKER_REGISTRY_CREDENTIALS = "corsisa-registry-user"*/
-        IMAGE_NAME = "${DOCKER_REGISTRY}/${APP_NAME}"
+        IMAGE_NAME = "devops.corsisa.com.ar:3200/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         SONAR_CREDENTIALS = "jenkins-sonarqube-token"
         GIT_URL = "https://github.com/mbcsa/complete-prodcution-e2e-pipeline"
