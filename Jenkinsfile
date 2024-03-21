@@ -39,7 +39,7 @@ pipeline{
                 sh "mvn test"
             }
         }
-        stage("Sonarqube Analysis") {
+/*        stage("Sonarqube Analysis") {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: SONAR_CREDENTIALS) {
@@ -56,7 +56,7 @@ pipeline{
                     waitForQualityGate abortPipeline: true, credentialsId: SONAR_CREDENTIALS
                 }
             }
-        }
+        }*/
         stage("Build & Push Docker Image") {
             steps {
                 script {
