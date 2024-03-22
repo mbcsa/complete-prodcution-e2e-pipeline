@@ -9,9 +9,9 @@ pipeline{
     environment {
         APP_NAME = "complete-prodcution-e2e-pipeline"
         RELEASE = "1.0.0"
-        DOCKER_REGISTRY = "http://devops.corsisa.com.ar:32000"
-/*        DOCKER_REGISTRY = "https://dkreg.corsisa.com.ar"  DOCKER_REGISTRY_CREDENTIALS = "corsisa-registry-user"*/
-        IMAGE_NAME = "devops.corsisa.com.ar:3200/${APP_NAME}"
+        DOCKER_REGISTRY = "https://dkreg.corsisa.com.ar"  
+	DOCKER_REGISTRY_CREDENTIALS = "corsisa-registry-user"
+        IMAGE_NAME = "dkreg.corsisa.com.ar/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         SONAR_CREDENTIALS = "jenkins-sonarqube-token"
         GIT_URL = "https://github.com/mbcsa/complete-prodcution-e2e-pipeline"
@@ -60,16 +60,16 @@ pipeline{
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry(DOCKER_REGISTRY) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push("latest")
-                    }
-                    /*docker.withRegistry(DOCKER_REGISTRY, DOCKER_REGISTRY_CREDENTIALS) {
+                    /*docker.withRegistry(DOCKER_REGISTRY) {
                         docker_image = docker.build "${IMAGE_NAME}"
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push("latest")
                     }*/
+                    docker.withRegistry(DOCKER_REGISTRY, DOCKER_REGISTRY_CREDENTIALS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push("latest")
+                    }
                 }
             }
         }
